@@ -17,6 +17,7 @@ import matplotlib.patches as mpatches
 import pickle
 from collections import Counter
 
+
 #%% Determinar path en el cual esta TCFinal
 #por primera y unica vez correr con F5 (y luego frenar corrida) (de lo contrario no funciona!)
 
@@ -33,6 +34,7 @@ sys.path.append(path)
 #%% Importar modulos relevantes para la deteccion de comunidades 
 
 import Comunidades as COM
+import GrafoLouvain as GL
 
 #%% OPCIONES DE ACHICAMIENTO DE RED
 
@@ -664,4 +666,23 @@ for n in range(len(clusterNets)):
     clusterNets.at[n, 'Consistency_avg']=con_avg
     clusterNets.at[n, 'Consistency_w_avg']=w_con_avg
   
-    
+#%%
+
+# Comparación entre las redes.
+
+# Primero, se reduce la red grande:
+GrafoResumido=GL.GrafoLouvain(X)    # X es el grafo a reducir
+
+distancia=nx.algorithms.similarity.graph_edit_distance(GrafoResumido,Y) # Y es el  grafo con el que lo vamos a comparar una vez reducido.
+
+# FALTA REEMPLAZAR 'X' E 'Y' ARRIBA.
+
+
+
+
+
+
+
+
+
+
