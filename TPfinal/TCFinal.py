@@ -604,59 +604,64 @@ for net in nNets:
         
 #%%
 
-#calculo la pureza de los clusters definidos por cada metrica y metodo de clustering
-
+#calculo la pureza y la consistencia de los clusters definidos por cada metrica y metodo de clustering
+        
 clusterNets['Purity_clusters'] = clusterNets['Purity_clusters'].astype(object)
+clusterNets['Consistency_clusters'] = clusterNets['Consistency_clusters'].astype(object)
 
 for n in range(len(clusterNets)):
     print(n)
     net = clusterNets.loc[n, 'IDNet']
     if dfNetworks.loc[net,'nodeType']=='CDR3':
-        print('enter')
+        print('CDR3')
         dCDR3=clusterNets['clusterDict'][n]
         mx=max(dCDR3.values())+1
         x = [[] for i in range(mx)]
+        x_epi = []
+        x_cluster = []
+        consistency=[]
+        w_consistency = []
         purity=[]
-        
+        w_epi = 0
         
         for key, value in dCDR3.items():
             epitope = TRBdf.loc[TRBdf['CDR3']==key, 'Epitope'].values[0]
             x[value].append(epitope)
+            x_epi.append(epitope)
+            x_cluster.append(value)
             
-                   
         for j in range(mx):
             count_elements=Counter(x[j])
             max_element = count_elements.most_common()[0][1]
             purity.append((max_element/len(x[j]))*100)
-        
+
         pur_avg = sum(purity)/len(purity)
+        
+        for k in set(x_epi):
+            zcluster = []
+            for iz, z in enumerate(x_epi):
+                if z == k:
+                    zcluster.append(x_cluster[iz])
+            c_zcluster=Counter(zcluster)
+            max_zcluster=c_zcluster.most_common()[0][1]
+            if len(zcluster) > 1:
+                consistency.append((max_zcluster/len(zcluster))*100)
+                w_consistency.append(max_zcluster*100)
+                w_epi += len(zcluster)
+        
+        con_avg = sum(consistency)/len(consistency)
+        w_con_avg = sum(w_consistency)/w_epi
         
     else:
         purity = 'Nan'
         pur_avg = 'Nan'
+        consistency = 'Nan'
+        con_avg = 'Nan'
+    
     clusterNets.at[n, 'Purity_clusters']=purity
     clusterNets.at[n, 'Purity_avg']=pur_avg
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
+    clusterNets.at[n, 'Consistency_clusters']=consistency
+    clusterNets.at[n, 'Consistency_avg']=con_avg
+    clusterNets.at[n, 'Consistency_w_avg']=w_con_avg
+  
     
