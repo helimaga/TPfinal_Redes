@@ -1,0 +1,62 @@
+cat blosum62.freq | \
+nawk 'BEGIN{i=1}{
+	if ( NF == 0 ) {
+		continue
+	}
+	if ( substr($1,1,1) == "#" ) {
+		print $0;
+		continue
+	}
+	if ( $1 == "A" ) {
+		for ( j=1;j<=NF;j++ ) {alphabet[j] = $j }
+		continue
+	}
+	for ( j=1;j<=NF;j++ ) { p[i,j] = $j } i++}
+END{
+	for ( i=1;i<21;i++ ) { 
+		for ( j=i+1;j<21; j++ ) { 
+			p[i,j] = p[j,i] 
+		}
+	} 
+
+	for ( i=1;i<21;i++ ) { 
+		for ( j=1;j<21; j++ ) { 
+			if ( i==-1 ) {
+				ss+= 2.0*p[i,j]; 
+			}
+			else {
+				ss+= p[i,j];
+			}
+			pi[i] += p[i,j];
+		}; 
+	} 
+
+	for ( i=1;i<21;i++ ) {
+		print "# P[i]: ", i, pi[i]
+		sp += pi[i];
+	}
+
+	print "# SUM: ", ss, " SUM_PI: ", sp
+
+#	pij is the row normalized probability
+#	pji ist he column normalized probability
+
+	for ( i=1;i<21;i++ ) {
+		for ( j=1;j<21; j++ ) { 
+			pij[i,j] = p[i,j]/pi[i];
+			pji[i,j] = p[i,j]/pi[j];
+		}
+	}
+
+	for ( i=1;i<21;i++ ) {
+		printf( " %6s", alphabet[i] );
+	}
+	printf( "\n" );
+
+	for ( i=1;i<21;i++ ) {
+		for ( j=1;j<21; j++ ) { 
+			printf( " %6.4f", (pij[i,j] ));
+		}
+		printf("\n" )
+	}
+}'
